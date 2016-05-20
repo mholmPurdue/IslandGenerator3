@@ -107,6 +107,16 @@ function lowest4Point(e,w,x,y){
 	return ret;
 }
 
+function mapToImage(image, width, height, map, name) {
+	for(var i = 0; i < width; i++) {
+		for(var j = 0; j < height; j++){
+			var t = Math.round(map[i][j]);
+			image.setPixelColor(jimp.rgbaToInt(t, t, t,255),i,j)
+		}
+	}
+	image.write(name);
+}
+
 function generateMap() {
 	var offsetx = Math.round(Math.random() * 1000);
 	var offsety = Math.round(Math.random() * 1000);
@@ -126,9 +136,11 @@ function generateMap() {
 	var scalarm5 = scalarm1*48;
 	var riverThreshold = 5;
 
-	var image = new jimp(width, height, 0x0000FFFF, function(err, image) {
-		console.log("image created");
-	})
+	var compImage = new jimp(width, height, 0x0000FFFF);
+	var elevationImage = new jimp(width, height, 0x0000FFFF);
+	var moistureImage = new jimp(width, height, 0x0000FFFF);
+	var waterImage = new jimp(width, height, 0x0000FFFF);
+
 
 	var elevationMap = new Array(height + 1);
 	for (var i = 0; i < height + 1; i++) {
@@ -203,26 +215,33 @@ function generateMap() {
 			var w = waterMap[i][j];
 			var mountain = (n-180)*2+180;
 			if (n <= 120) //ocean
-				image.setPixelColor(jimp.rgbaToInt(0, 60, 82,255),i,j)
+				compImage.setPixelColor(jimp.rgbaToInt(0, 60, 82,255),i,j)
 			else if (w < riverThreshold && w > 0)//river
-				image.setPixelColor(jimp.rgbaToInt(255,243,191,255),i,j);
+				compImage.setPixelColor(jimp.rgbaToInt(255,243,191,255),i,j);
 			else if (w >= riverThreshold)//river
-				image.setPixelColor(jimp.rgbaToInt(0, 60, 82,255),i,j);
+				compImage.setPixelColor(jimp.rgbaToInt(0, 60, 82,255),i,j);
 			else if (n <= 130)//beach
-				image.setPixelColor(jimp.rgbaToInt(154, 140, 112,255),i,j)
+				compImage.setPixelColor(jimp.rgbaToInt(154, 140, 112,255),i,j)
 			else if (n < 180 && m < 130)//plain
-				image.setPixelColor(jimp.rgbaToInt(83, 109, 50,255),i,j)
+				compImage.setPixelColor(jimp.rgbaToInt(83, 109, 50,255),i,j)
 			else if (n < 180 && m >= 130)//forest
-				image.setPixelColor(jimp.rgbaToInt(50,80,50,255),i,j)
+				compImage.setPixelColor(jimp.rgbaToInt(50,80,50,255),i,j)
 			else
-				image.setPixelColor(jimp.rgbaToInt(mountain,mountain,mountain,255),i,j)
+				compImage.setPixelColor(jimp.rgbaToInt(mountain,mountain,mountain,255),i,j)
 			
 
 			
 		}
 	}
-	image.write("map.png",function(){
-		process.exit(1);
+
+	mapToImage(elevationImage, width, height, elevationMap, "ElevationMap.png");
+	mapToImage(moistureImage, width, height, moistureMap, "MoistureMap.png");
+	mapToImage(waterImage, width, height, waterMap, "WaterMap.png");
+
+	compImage.write("map.png",function(){
+		setTimeout(function() {
+    		process.exit(1);
+		}, 3000);
 	})
 	console.log("finished map")
 }
