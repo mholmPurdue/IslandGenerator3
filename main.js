@@ -134,7 +134,7 @@ function generateMap() {
 	var scalarm3 = scalarm1*8;
 	var scalarm4 = scalarm1*16;
 	var scalarm5 = scalarm1*48;
-	var riverThreshold = 5;
+	var riverThreshold = 3;
 
 	var compImage = new jimp(width, height, 0x0000FFFF);
 	var elevationImage = new jimp(width, height, 0x0000FFFF);
@@ -216,8 +216,6 @@ function generateMap() {
 			var mountain = (n-180)*2+180;
 			if (n <= 120) //ocean
 				compImage.setPixelColor(jimp.rgbaToInt(0, 60, 82,255),i,j)
-			else if (w < riverThreshold && w > 0)//river
-				compImage.setPixelColor(jimp.rgbaToInt(255,243,191,255),i,j);
 			else if (w >= riverThreshold)//river
 				compImage.setPixelColor(jimp.rgbaToInt(0, 60, 82,255),i,j);
 			else if (n <= 130)//beach
@@ -229,7 +227,8 @@ function generateMap() {
 			else
 				compImage.setPixelColor(jimp.rgbaToInt(mountain,mountain,mountain,255),i,j)
 			
-
+			if (w < riverThreshold && w > 0 && n > 120)//light river
+							compImage.setPixelColor(jimp.rgbaToInt(0, 60, 82,w*100+55),i,j);
 			
 		}
 	}
