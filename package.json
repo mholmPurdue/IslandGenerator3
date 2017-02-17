@@ -1,0 +1,23 @@
+{
+  "name": "islandgenerator3",
+  "version": "0.1.0",
+  "description": "I make an island",
+  "main": "main.js",
+  "dependencies": {
+    "jimp": "^0.2.27"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "node main.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mholmPurdue/IslandGenerator3.git"
+  },
+  "author": "Mitch Holm",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/mholmPurdue/IslandGenerator3/issues"
+  },
+  "homepage": "https://github.com/mholmPurdue/IslandGenerator3#readme"
+}
