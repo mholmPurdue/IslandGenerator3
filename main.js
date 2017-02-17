@@ -100,6 +100,37 @@ function mapToImage(image, width, height, map, name) {
 	image.write(name);
 }
 
+function generateRainMap(width, height, elevationMap, moistureMap){
+	var waterMap = new Array(height + 1);
+	for (var i = 0; i < height + 1; i++) {
+	  waterMap[i] = new Array(width + 1);
+	  for(var j = 0; j <= width; j++){
+	  	waterMap[i][j] = 0;
+	  }
+	}
+
+
+	var dropX, dropY;
+	for(var i = 0; i < 30; i++){
+		do {
+			var dropX = Math.round(Math.random() * (width/3) + width/3);
+			var dropY = Math.round(Math.random() * (height/3) + height/3);
+		} while (elevationMap[dropX][dropY] < 130 || moistureMap[dropX][dropY] < 100)
+		if(moistureMap[dropX][dropY])
+		while(elevationMap[dropX][dropY] > 110){
+			waterMap[dropX][dropY] += 1;
+			var t = lowest4Point(elevationMap, waterMap, dropX, dropY);
+			if(t[0] == dropX && t[1] == dropY){
+				continue;
+			}
+			dropX = t[0];
+			dropY = t[1];
+		}
+	}
+
+	return waterMap;
+}
+
 function generateMap() {
 	var offsetx = Math.round(Math.random() * 1000);
 	var offsety = Math.round(Math.random() * 1000);
@@ -135,11 +166,6 @@ function generateMap() {
 	  moistureMap[i] = new Array(width + 1);
 	}
 
-	var waterMap = new Array(height + 1);
-	for (var i = 0; i < height + 1; i++) {
-	  waterMap[i] = new Array(width + 1);
-	}
-
 	for(var i = offsetx; i < width +offsetx; i++){
 		for(var j = offsety; j < height + offsety; j++){
 			var n = PerlinNoise.noise(i * scalar, j * scalar, 1) * 1 
@@ -163,32 +189,12 @@ function generateMap() {
 			
 			elevationMap[i-offsetx][j-offsety] = n * 255;
 			moistureMap[i-offsetx][j-offsety] = m;
-			waterMap[i-offsetx][j-offsety] = 0;
-
-			
 		}
 		
 	}
 	console.log("heightmap done");	
-	//raindrop spawning
-	var dropX, dropY;
-	for(var i = 0; i < 30; i++){
-		do {
-			var dropX = Math.round(Math.random() * (width/3) + width/3);
-			var dropY = Math.round(Math.random() * (height/3) + height/3);
-		} while (elevationMap[dropX][dropY] < 130 || moistureMap[dropX][dropY] < 100)
-		if(moistureMap[dropX][dropY])
-		while(elevationMap[dropX][dropY] > 110){
-			waterMap[dropX][dropY] += 1;
-			var t = lowest4Point(elevationMap, waterMap, dropX, dropY);
-			if(t[0] == dropX && t[1] == dropY){
-				continue;
-			}
-			dropX = t[0];
-			dropY = t[1];
-		}
-	}
-
+	
+	var waterMap = generateRainMap(width, height, elevationMap, moistureMap);
 	console.log("rain done");
 
 	for(var i = 0; i < width; i++){
